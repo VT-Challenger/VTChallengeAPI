@@ -26,15 +26,6 @@ namespace VTChallengeAPI.Controllers {
             this.helper = helper;
         }
 
-        [HttpGet]
-        [Route("[action]")]
-        [Authorize]
-        public async Task<ActionResult<Usuario>> Profile() {
-            Claim claim = HttpContext.User.Claims.SingleOrDefault(x => x.Type == "UserData");
-            string jsonUsuario = claim.Value;
-            Usuario usuario = JsonConvert.DeserializeObject<Usuario>(jsonUsuario);
-            return usuario;
-        }
 
         [HttpPost]
         [Route("[action]")]
@@ -80,9 +71,9 @@ namespace VTChallengeAPI.Controllers {
                 user.ImageLarge = data.Card.Large;
                 user.ImageSmall = data.Card.Small;
                 user.Rank = await this.api.GetRankAsync(user.Name, user.Tag);
-            } else if(data != null){
+            }
+            if(data != null){
                 await this.repo.RegisterUserAsync(user.Uid, user.Name, user.Tag, user.Email, user.Password, user.ImageSmall, user.ImageLarge, user.Rank);
-        
             }
             return Ok();
         }
