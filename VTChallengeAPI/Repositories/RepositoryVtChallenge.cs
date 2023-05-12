@@ -1,12 +1,12 @@
 ﻿using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
-using System.Data;
-using VTChallengeAPI.Data;
-using VTChallengeAPI.Helpers;
+using NugetVTChallenge.Interfaces;
 using NugetVTChallenge.Models;
 using NugetVTChallenge.Models.Api;
-using NugetVTChallenge.Interfaces;
+using System.Data;
 using VTChallenge.Services;
+using VTChallengeAPI.Data;
+using VTChallengeAPI.Helpers;
 
 namespace VTChallengeAPI.Repositories {
 
@@ -133,7 +133,7 @@ namespace VTChallengeAPI.Repositories {
 
             return await consulta.ToListAsync();
         }
-    
+
         public async Task<List<TournamentComplete>> GetTournamentsByRankAsync(string rank) {
             var consulta = from data in this.context.TournamentCompletes
                            where data.Rank.Contains(rank) || data.Rank.Contains("Unranked")
@@ -232,11 +232,12 @@ namespace VTChallengeAPI.Repositories {
             return await consulta.ToListAsync();
         }
 
-        public async Task DeleteTournament(int tid) {
-            string sql = "SP_DELETE_TOURNAMENT @TID";
+        public async Task DeleteTournament(int tid, string uid) {
+            string sql = "SP_DELETE_TOURNAMENT @TID, @UID";
             SqlParameter pamTid = new SqlParameter("@TID", tid);
+            SqlParameter pamUid = new SqlParameter("@UID", uid);
 
-            await this.context.Database.ExecuteSqlRawAsync(sql, pamTid);
+            await this.context.Database.ExecuteSqlRawAsync(sql, pamTid, pamUid);
         }
 
         public async Task<Match> FindMatchAsync(int mid) {
@@ -244,7 +245,7 @@ namespace VTChallengeAPI.Repositories {
         }
 
 
-        public async Task DeteleUserTournamentAsync(int tid, string uid) {
+        public async Task DeleteUserTournamentAsync(int tid, string uid) {
             string sql = "SP_DELETE_PLAYER_TOURNAMENT @TID, @UID";
             SqlParameter pamTid = new SqlParameter("@TID", tid);
             SqlParameter pamUid = new SqlParameter("@UID", uid);
@@ -305,7 +306,7 @@ namespace VTChallengeAPI.Repositories {
 
         public async Task InsertRoundAsync(string name, DateTime date, int tid) {
             Round round = new Round() {
-                Rid = await this.context.Rounds.MaxAsync(r => r.Rid)+1,
+                Rid = await this.context.Rounds.MaxAsync(r => r.Rid) + 1,
                 Name = name,
                 Date = date,
                 Tid = tid

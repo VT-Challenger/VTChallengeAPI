@@ -17,6 +17,8 @@ builder.Services.AddAuthentication(helper.GetAuthenticationOptions()).AddJwtBear
 string connectionString = builder.Configuration.GetConnectionString("SqlAzure");
 
 builder.Services.AddSingleton<HelperCryptography>();
+builder.Services.AddTransient<HelperUserToken>();
+builder.Services.AddHttpContextAccessor();
 builder.Services.AddTransient<HttpClient>();
 builder.Services.AddTransient<IVtChallenge, RepositoryVtChallenge>();
 builder.Services.AddTransient<IServiceValorant, ServiceValorant>();
