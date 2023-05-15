@@ -41,7 +41,6 @@ namespace VTChallengeAPI.Controllers {
                 Claim[] information = new[] {
                     new Claim("UserData", jsonUsuario)
                 };
-
                 // EL TOKEN SE GENERA CON UNA CLASE Y DEBEMOS INDICAR
                 // LOS DATOS QUE CONFORMAN DICHO TOKEN
                 JwtSecurityToken token = new JwtSecurityToken(
