@@ -120,14 +120,13 @@ namespace VTChallengeAPI.Controllers {
         }
 
 
-
         [HttpPost]
         [Authorize]
         [Route("[action]")]
         public async Task<ActionResult> CreateTournament(InsertTournament objects) {
             int tid = this.repo.GetMaxIdTournament();
 
-            Tournament tournament = JsonConvert.DeserializeObject<Tournament>(objects.JsonTournament);
+            Tournament tournament = objects.JsonTournament;
             await this.repo.InsertTournamentAsync(
                 tournament.Tid = tid + 1,
                 tournament.Name,
@@ -136,11 +135,11 @@ namespace VTChallengeAPI.Controllers {
                 tournament.Description,
                 tournament.Platform,
                 tournament.Players,
-                this.helper.GetUserToken().Name,
+                this.helper.GetUserToken().Uid,
                 tournament.Image
             );
 
-            List<Round> rounds = JsonConvert.DeserializeObject<List<Round>>(objects.JsonRounds);
+            List<Round> rounds = objects.JsonRounds;
             foreach (Round round in rounds) {
                 await this.repo.InsertRoundAsync(
                     round.Name,
@@ -151,7 +150,7 @@ namespace VTChallengeAPI.Controllers {
 
             int roundMatch = this.repo.GetMinIdRoundTournament(tid + 1);
             Round r = await this.repo.FindRoundAsync(roundMatch);
-            List<Match> matches = JsonConvert.DeserializeObject<List<Match>>(objects.JsonMatches);
+            List<Match> matches = objects.JsonMatches;
             foreach (Match match in matches) {
                 await this.repo.InsertMatchAsync(
                     match.Tblue,
@@ -166,8 +165,8 @@ namespace VTChallengeAPI.Controllers {
 
         [HttpPut]
         [Authorize]
-        [Route("[action]/{tid}")]
-        public async Task<ActionResult> UpdateTournament(int tid, List<Match> partidas) {
+        [Route("[action]")]
+        public async Task<ActionResult> UpdateResultMatches(List<Match> partidas) {
             int rid = partidas[partidas.Count - 1].Rid;
             foreach (Match match in partidas) {
                 await this.repo.UpdateMatchesTournamentAsync(match.Mid, match.Rblue, match.Rred);
@@ -179,6 +178,13 @@ namespace VTChallengeAPI.Controllers {
             return Ok();
         }
 
+        [HttpDelete]
+        [Authorize]
+        [Route("[action]/{tid}/{uid}")]
+        public async Task<ActionResult> DeleteUserTournament(int tid, string uid) {
+            await this.repo.DeleteUserTournamentAsync(tid,uid);
+            return Ok();
+        }
 
 
 

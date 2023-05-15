@@ -40,5 +40,13 @@ namespace VTChallengeAPI.Controllers {
             return Ok("Debe volver a iniciar sesión para ver los cambios");
         }
 
+        [HttpGet]
+        [Route("[action]")]
+        [Authorize]
+        public async Task<ActionResult<int>> Victories() {
+            return await this.repo.GetTotalWinsAsync(this.helper.GetUserToken().Uid);
+        }
+
+
     }
 }
